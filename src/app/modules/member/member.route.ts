@@ -15,7 +15,7 @@ router.get("/", MemberController.getAllMembers);
 
 router.get("/:id", MemberController.getMemberById);
 
-router.patch(
+router.put(
   "/:id",
   validateRequest(MemberValidations.updateMemberValidationSchema),
   MemberController.updateMember

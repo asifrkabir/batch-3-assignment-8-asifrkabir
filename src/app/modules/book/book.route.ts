@@ -15,7 +15,7 @@ router.get("/", BookController.getAllBooks);
 
 router.get("/:id", BookController.getBookById);
 
-router.patch(
+router.put(
   "/:id",
   validateRequest(BookValidations.updateBookValidationSchema),
   BookController.updateBook
