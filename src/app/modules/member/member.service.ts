@@ -52,9 +52,30 @@ const updateMember = async (id: string, payload: Partial<Member>) => {
   return result;
 };
 
+const deleteMember = async (id: string) => {
+  const existingMember = await prisma.member.findUnique({
+    where: {
+      memberId: id,
+    },
+  });
+
+  if (existingMember === null) {
+    throw new AppError(httpStatus.NOT_FOUND, "Member not found");
+  }
+
+  const result = await prisma.member.delete({
+    where: {
+      memberId: id,
+    },
+  });
+
+  return result;
+};
+
 export const MemberService = {
   createMember,
   getAllMembers,
   getMemberById,
   updateMember,
+  deleteMember,
 };

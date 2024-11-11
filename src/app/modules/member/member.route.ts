@@ -11,4 +11,6 @@ router.get("/:id", MemberController.getMemberById);
 
 router.patch("/:id", MemberController.updateMember);
 
+router.delete("/:id", MemberController.deleteMember);
+
 export const MemberRoutes = router;
