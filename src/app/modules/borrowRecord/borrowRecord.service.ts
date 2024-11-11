@@ -15,6 +15,10 @@ const borrowBook = async (payload: BorrowRecord) => {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid Book ID");
   }
 
+  if (existingBook.availableCopies <= 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, "No available copies");
+  }
+
   const existingMember = await prisma.member.findUnique({
     where: {
       memberId: payload.memberId,
