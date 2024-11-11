@@ -39,7 +39,7 @@ const updateBook = async (id: string, payload: Partial<Book>) => {
   });
 
   if (existingBook === null) {
-    throw new AppError(httpStatus.NOT_FOUND, "Book not found");
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid Book ID");
   }
 
   const result = await prisma.book.update({
@@ -60,7 +60,7 @@ const deleteBook = async (id: string) => {
   });
 
   if (existingBook === null) {
-    throw new AppError(httpStatus.NOT_FOUND, "Book not found");
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid Book ID");
   }
 
   const result = await prisma.book.delete({
