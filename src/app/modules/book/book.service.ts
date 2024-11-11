@@ -31,8 +31,30 @@ const getBookById = async (id: string) => {
   return result;
 };
 
+const updateBook = async (id: string, payload: Partial<Book>) => {
+  const existingBook = await prisma.book.findUnique({
+    where: {
+      bookId: id,
+    },
+  });
+
+  if (existingBook === null) {
+    throw new AppError(httpStatus.NOT_FOUND, "Book not found");
+  }
+
+  const result = await prisma.book.update({
+    where: {
+      bookId: id,
+    },
+    data: payload,
+  });
+
+  return result;
+};
+
 export const BookService = {
   createBook,
   getAllBooks,
   getBookById,
+  updateBook,
 };
