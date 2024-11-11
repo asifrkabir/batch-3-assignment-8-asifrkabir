@@ -9,4 +9,6 @@ router.get("/", MemberController.getAllMembers);
 
 router.get("/:id", MemberController.getMemberById);
 
+router.patch("/:id", MemberController.updateMember);
+
 export const MemberRoutes = router;

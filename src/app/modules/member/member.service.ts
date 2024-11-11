@@ -31,8 +31,30 @@ const getMemberById = async (id: string) => {
   return result;
 };
 
+const updateMember = async (id: string, payload: Partial<Member>) => {
+  const existingMember = await prisma.member.findUnique({
+    where: {
+      memberId: id,
+    },
+  });
+
+  if (existingMember === null) {
+    throw new AppError(httpStatus.NOT_FOUND, "Member not found");
+  }
+
+  const result = await prisma.member.update({
+    where: {
+      memberId: id,
+    },
+    data: payload,
+  });
+
+  return result;
+};
+
 export const MemberService = {
   createMember,
   getAllMembers,
   getMemberById,
+  updateMember,
 };
