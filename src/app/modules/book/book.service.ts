@@ -54,6 +54,8 @@ const updateBook = async (id: string, payload: Partial<Book>) => {
     );
   }
 
+  payload.bookId = id;
+
   const result = await prisma.book.update({
     where: {
       bookId: id,

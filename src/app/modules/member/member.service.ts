@@ -64,6 +64,8 @@ const updateMember = async (id: string, payload: Partial<Member>) => {
     }
   }
 
+  payload.memberId = id;
+
   const result = await prisma.member.update({
     where: {
       memberId: id,
