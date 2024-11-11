@@ -49,7 +49,7 @@ const updateMember = async (id: string, payload: Partial<Member>) => {
   });
 
   if (existingMember === null) {
-    throw new AppError(httpStatus.NOT_FOUND, "Member not found");
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid Member ID");
   }
 
   if (payload?.email) {
@@ -82,7 +82,7 @@ const deleteMember = async (id: string) => {
   });
 
   if (existingMember === null) {
-    throw new AppError(httpStatus.NOT_FOUND, "Member not found");
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid Member ID");
   }
 
   const borrowRecordCount = await prisma.borrowRecord.count({

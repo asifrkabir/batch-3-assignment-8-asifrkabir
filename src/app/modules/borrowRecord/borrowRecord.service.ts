@@ -5,8 +5,41 @@ import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 
 const borrowBook = async (payload: BorrowRecord) => {
-  const result = await prisma.borrowRecord.create({
-    data: payload,
+  const existingBook = await prisma.book.findUnique({
+    where: {
+      bookId: payload.bookId,
+    },
+  });
+
+  if (existingBook === null) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid Book ID");
+  }
+
+  const existingMember = await prisma.member.findUnique({
+    where: {
+      memberId: payload.memberId,
+    },
+  });
+
+  if (existingMember === null) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid Member ID");
+  }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    const createdBorrowRecord = await transactionClient.borrowRecord.create({
+      data: payload,
+    });
+
+    await transactionClient.book.update({
+      where: {
+        bookId: payload.bookId,
+      },
+      data: {
+        availableCopies: existingBook.availableCopies - 1,
+      },
+    });
+
+    return createdBorrowRecord;
   });
 
   const { returnDate, ...rest } = result;
@@ -21,19 +54,41 @@ const returnBook = async (payload: Partial<BorrowRecord>) => {
     where: {
       borrowId: id,
     },
+    include: {
+      Book: true,
+    },
   });
 
   if (existingBorrowRecord === null) {
     throw new AppError(httpStatus.NOT_FOUND, "Borrow record not found");
   }
 
-  const result = await prisma.borrowRecord.update({
-    where: {
-      borrowId: id,
-    },
-    data: {
-      returnDate: new Date(),
-    },
+  if (existingBorrowRecord.returnDate) {
+    throw new AppError(httpStatus.BAD_REQUEST, "The book was already returned");
+  }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    const updatedBorrowRecord = await transactionClient.borrowRecord.update({
+      where: {
+        borrowId: id,
+      },
+      data: {
+        returnDate: new Date(),
+      },
+    });
+
+    const existingBook = existingBorrowRecord.Book;
+
+    await transactionClient.book.update({
+      where: {
+        bookId: updatedBorrowRecord.bookId,
+      },
+      data: {
+        availableCopies: existingBook.availableCopies + 1,
+      },
+    });
+
+    return updatedBorrowRecord;
   });
 
   return result;
@@ -49,7 +104,7 @@ const getOverdueBorrowList = async () => {
     where: {
       returnDate: null,
       borrowDate: {
-        lt: lastAllowedDate, // Borrow date is less than last allowed date to return
+        lt: lastAllowedDate,
       },
     },
     include: {
