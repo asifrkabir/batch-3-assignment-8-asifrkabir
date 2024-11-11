@@ -42,6 +42,18 @@ const updateBook = async (id: string, payload: Partial<Book>) => {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid Book ID");
   }
 
+  const updatedBookData = {
+    ...existingBook,
+    ...payload,
+  };
+
+  if (updatedBookData.availableCopies > updatedBookData.totalCopies) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Available Copies cannot be greater than Total Copies"
+    );
+  }
+
   const result = await prisma.book.update({
     where: {
       bookId: id,
