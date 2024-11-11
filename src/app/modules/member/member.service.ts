@@ -4,6 +4,16 @@ import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 
 const createMember = async (payload: Member) => {
+  const existingEmailCount = await prisma.member.count({
+    where: {
+      email: payload.email,
+    },
+  });
+
+  if (existingEmailCount > 0) {
+    throw new AppError(httpStatus.CONFLICT, "This email already exists");
+  }
+
   const result = await prisma.member.create({
     data: payload,
   });
@@ -42,6 +52,18 @@ const updateMember = async (id: string, payload: Partial<Member>) => {
     throw new AppError(httpStatus.NOT_FOUND, "Member not found");
   }
 
+  if (payload?.email) {
+    const existingEmailCount = await prisma.member.count({
+      where: {
+        email: payload.email,
+      },
+    });
+
+    if (existingEmailCount > 0) {
+      throw new AppError(httpStatus.CONFLICT, "This email already exists");
+    }
+  }
+
   const result = await prisma.member.update({
     where: {
       memberId: id,
@@ -61,6 +83,19 @@ const deleteMember = async (id: string) => {
 
   if (existingMember === null) {
     throw new AppError(httpStatus.NOT_FOUND, "Member not found");
+  }
+
+  const borrowRecordCount = await prisma.borrowRecord.count({
+    where: {
+      memberId: id,
+    },
+  });
+
+  if (borrowRecordCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Cannot delete the member because there are borrow records associated with them."
+    );
   }
 
   const result = await prisma.member.delete({
