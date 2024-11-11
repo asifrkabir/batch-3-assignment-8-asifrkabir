@@ -20,7 +20,7 @@ app.use(cookieParser());
 // Parsers
 app.use(express.json());
 
-app.use("/api/v1", router);
+app.use("/api", router);
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.send(`Library Management App is listening on port ${config.port}`);
