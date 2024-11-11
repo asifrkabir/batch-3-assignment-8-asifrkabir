@@ -17,12 +17,21 @@ const createBook = catchAsync(async (req, res) => {
 const getAllBooks = catchAsync(async (req, res) => {
   const result = await BookService.getAllBooks();
 
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Books retrieved successfully",
-    data: result,
-  });
+  if (result.length <= 0) {
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "No data found",
+      data: result,
+    });
+  } else {
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Books retrieved successfully",
+      data: result,
+    });
+  }
 });
 
 const getBookById = catchAsync(async (req, res) => {

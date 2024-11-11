@@ -17,12 +17,21 @@ const createMember = catchAsync(async (req, res) => {
 const getAllMembers = catchAsync(async (req, res) => {
   const result = await MemberService.getAllMembers();
 
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Members retrieved successfully",
-    data: result,
-  });
+  if (result.length <= 0) {
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "No data found",
+      data: result,
+    });
+  } else {
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Members retrieved successfully",
+      data: result,
+    });
+  }
 });
 
 const getMemberById = catchAsync(async (req, res) => {
