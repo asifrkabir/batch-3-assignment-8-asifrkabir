@@ -75,6 +75,19 @@ const deleteBook = async (id: string) => {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid Book ID");
   }
 
+  const borrowRecordCount = await prisma.borrowRecord.count({
+    where: {
+      bookId: id,
+    },
+  });
+
+  if (borrowRecordCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Cannot delete the book because there are borrow records associated with it."
+    );
+  }
+
   const result = await prisma.book.delete({
     where: {
       bookId: id,
