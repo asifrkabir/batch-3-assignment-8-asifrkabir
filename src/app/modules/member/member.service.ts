@@ -1,5 +1,7 @@
 import { Member } from "@prisma/client";
 import prisma from "../../config/prisma";
+import AppError from "../../errors/AppError";
+import httpStatus from "http-status";
 
 const createMember = async (payload: Member) => {
   const result = await prisma.member.create({
@@ -15,7 +17,22 @@ const getAllMembers = async () => {
   return result;
 };
 
+const getMemberById = async (id: string) => {
+  const result = await prisma.member.findUnique({
+    where: {
+      memberId: id,
+    },
+  });
+
+  if (result === null) {
+    throw new AppError(httpStatus.NOT_FOUND, "Member not found");
+  }
+
+  return result;
+};
+
 export const MemberService = {
   createMember,
   getAllMembers,
+  getMemberById,
 };
