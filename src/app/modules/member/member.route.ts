@@ -5,4 +5,6 @@ const router = Router();
 
 router.post("/", MemberController.createMember);
 
+router.get("/", MemberController.getAllMembers);
+
 export const MemberRoutes = router;
