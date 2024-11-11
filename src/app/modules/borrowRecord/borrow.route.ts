@@ -5,4 +5,6 @@ const router = Router();
 
 router.post("/", BorrowRecordController.borrowBook);
 
+router.get("/overdue", BorrowRecordController.getOverdueBorrowList);
+
 export const BorrowRoutes = router;

@@ -39,7 +39,53 @@ const returnBook = async (payload: Partial<BorrowRecord>) => {
   return result;
 };
 
+const getOverdueBorrowList = async () => {
+  const today = new Date();
+
+  const lastAllowedDate = new Date();
+  lastAllowedDate.setDate(today.getDate() - 14);
+
+  const overdueRecords = await prisma.borrowRecord.findMany({
+    where: {
+      returnDate: null,
+      borrowDate: {
+        lt: lastAllowedDate, // Borrow date is less than last allowed date to return
+      },
+    },
+    include: {
+      Book: {
+        select: {
+          title: true,
+        },
+      },
+      Member: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  const result = overdueRecords.map((borrowRecord) => {
+    const overdueDays =
+      Math.floor(
+        (today.getTime() - borrowRecord.borrowDate.getTime()) /
+          (1000 * 60 * 60 * 24)
+      ) - 14;
+
+    return {
+      borrowId: borrowRecord.borrowId,
+      bookTitle: borrowRecord.Book.title,
+      borrowerName: borrowRecord.Member.name,
+      overdueDays,
+    };
+  });
+
+  return result;
+};
+
 export const BorrowRecordService = {
   borrowBook,
   returnBook,
+  getOverdueBorrowList,
 };
