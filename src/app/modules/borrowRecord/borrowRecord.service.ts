@@ -34,14 +34,14 @@ const borrowBook = async (payload: BorrowRecord) => {
       data: payload,
     });
 
-    await transactionClient.book.update({
-      where: {
-        bookId: payload.bookId,
-      },
-      data: {
-        availableCopies: existingBook.availableCopies - 1,
-      },
-    });
+    // await transactionClient.book.update({
+    //   where: {
+    //     bookId: payload.bookId,
+    //   },
+    //   data: {
+    //     availableCopies: existingBook.availableCopies - 1,
+    //   },
+    // });
 
     return createdBorrowRecord;
   });
@@ -81,16 +81,16 @@ const returnBook = async (payload: Partial<BorrowRecord>) => {
       },
     });
 
-    const existingBook = existingBorrowRecord.Book;
+    // const existingBook = existingBorrowRecord.Book;
 
-    await transactionClient.book.update({
-      where: {
-        bookId: updatedBorrowRecord.bookId,
-      },
-      data: {
-        availableCopies: existingBook.availableCopies + 1,
-      },
-    });
+    // await transactionClient.book.update({
+    //   where: {
+    //     bookId: updatedBorrowRecord.bookId,
+    //   },
+    //   data: {
+    //     availableCopies: existingBook.availableCopies + 1,
+    //   },
+    // });
 
     return updatedBorrowRecord;
   });

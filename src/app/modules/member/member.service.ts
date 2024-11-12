@@ -71,6 +71,12 @@ const updateMember = async (id: string, payload: Partial<Member>) => {
       memberId: id,
     },
     data: payload,
+    select: {
+      memberId: true,
+      name: true,
+      email: true,
+      phone: true,
+    },
   });
 
   return result;
